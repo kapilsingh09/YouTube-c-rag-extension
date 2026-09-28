@@ -14,7 +14,11 @@ from app.cache import (
     video_processing_lock,
 )
 from app.ingestion.transcript import CHUNKING_VERSION, build_chunks
+<<<<<<< HEAD
 from app.llm.models import get_groq_variant
+=======
+from app.llm.models import google_llm,groq_llm
+>>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
 
 
 DEFAULT_DB_PATH = Path(__file__).resolve().parents[1] / "data" / "video_summaries.sqlite3"
@@ -76,8 +80,12 @@ def get_video_summary(video_id: str) -> str | None:
 
 
 def _invoke_summary(prompt: str, transcript: str) -> str:
+<<<<<<< HEAD
     model = get_groq_variant("summary")
     response = model.invoke(prompt.format(transcript=transcript))
+=======
+    response = groq_llm.invoke(prompt.format(transcript=transcript))
+>>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
     content = response.content
     if isinstance(content, str):
         summary = content.strip()

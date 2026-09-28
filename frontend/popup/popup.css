@@ -172,14 +172,20 @@ body.welcome-mode #input-wrapper {
 
 /* ── AI bubble ── */
 .bot-message {
+<<<<<<< HEAD
   position: relative;
+=======
+>>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
   align-self: flex-start;
   width: fit-content;
   background: #151515;
   border: 1px solid #383838;
   color: #fff;
   border-radius: 14px;
+<<<<<<< HEAD
   padding-top: 22px;
+=======
+>>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
 }
 
 .bot-message > :first-child {
@@ -334,6 +340,7 @@ body.welcome-mode #input-wrapper {
 }
 
 .top-source-badge {
+<<<<<<< HEAD
   position: absolute;
   top: 8px;
   right: 10px;
@@ -351,6 +358,21 @@ body.welcome-mode #input-wrapper {
   font-weight: 600;
   line-height: 1.1;
   z-index: 1;
+=======
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  margin-bottom: 8px;
+  padding: 4px 8px;
+  border: 1px solid rgba(102, 207, 255, 0.28);
+  border-radius: 6px;
+  background: rgba(32, 190, 255, 0.08);
+  color: #8ad9ff;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.2;
+>>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
 }
 
 .source-used {
@@ -360,11 +382,14 @@ body.welcome-mode #input-wrapper {
   white-space: nowrap;
 }
 
+<<<<<<< HEAD
 .source-used i {
   font-size: 9px;
   line-height: 1;
 }
 
+=======
+>>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
 /* ── Error bubble ── */
 .error-message {
   align-self: center;
