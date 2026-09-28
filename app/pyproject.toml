@@ -1,0 +1,22 @@
+[project]
+name = "langchain-learning"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "ipykernel>=7.3.0",
+    "langchain>=1.3.14",
+    "langchain-community>=0.4.2",
+    "langchain-core>=1.4.9",
+    "langchain-google-genai>=4.2.7",
+    "langchain-huggingface>=1.2.2",
+    "langgraph>=1.2.9",
+    "langgraph-checkpoint-sqlite>=3.1.1",
+    "langgraph-prebuilt>=1.1.0",
+    "pypdf>=6.14.2",
+    "python-dotenv>=1.2.2",
+    "sentence-transformers>=5.7.0",
+    "torch>=2.13.0",
+    "torchvision>=0.28.0",
+]

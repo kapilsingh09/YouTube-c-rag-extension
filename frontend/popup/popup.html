@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>YT Chat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="tailwind.css">
+  <link rel="stylesheet" href="popup.css">
+</head>
+
+<!-- Tailwind safelist: classes toggled only by JS at runtime -->
+<div class="hidden opacity-0 opacity-100 scale-90 scale-100 border-red-500"></div>
+
+<body class="m-0 relative overflow-hidden bg-[#121212] text-white flex flex-col">
+
+  <!-- ═══ HEADER ═══ -->
+  <header class="flex items-center px-3.5 py-2.5 border-b border-[#303030] bg-[#121212] shrink-0 z-10 gap-3">
+
+    <!-- Brand -->
+    <div class="flex items-center gap-2 shrink-0">
+     
+      <h1 class="text-[13px] font-semibold">Youtube Chat</h1>
+    </div>
+
+    <!-- Spacer -->
+    <div class="flex-1"></div>
+
+    <!-- Model pill -->
+    <div class="cursor-pointer shrink-0" id="model-pill-container">
+      <div id="model-pill"
+        class="flex items-center gap-2 px-3 py-[5px]
+               border border-[#303030] rounded-full bg-[#1e1e1e]
+               transition-all duration-200 hover:border-[#404040]">
+        <div class="w-[6px] h-[6px] rounded-full bg-[#00ffbf] animate-pulse"></div>
+        <span id="active-model-text"
+          class="text-[11px] font-medium text-[#bbb] tracking-[.01em] font-code">
+          Groq
+        </span>
+      </div>
+    </div>
+
+    <!-- Hidden toggle (needed by JS) -->
+    <button id="toggle-model-btn" class="hidden" title="Toggle model name">
+      <i id="toggle-model-icon" class="fa-regular fa-eye-slash"></i>
+    </button>
+
+    <!-- Actions -->
+    <div class="flex gap-0.5 shrink-0">
+      <button id="reset-btn"
+        class="w-8 h-8 border-none bg-red-700 rounded-md text-white
+               flex items-center justify-center cursor-pointer
+               transition-all hover:bg-red-600"
+        title="Clear chat">
+        <i class="fa-solid fa-trash text-[12px]"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- ═══ BODY ═══ -->
+  <div class="flex-1 flex flex-col overflow-hidden relative px-3.5 pt-3">
+
+    <!-- ── Context ── -->
+    <div class="mb-3">
+      <div class="flex items-center justify-between px-0.5 pb-1.5">
+        <span class="text-[10px] font-semibold tracking-[.1em] uppercase text-[#666] font-code">
+          Context
+        </span>
+        <button id="toggle-banner-btn"
+          class="border-none bg-white text-black cursor-pointer px-2 py-1 rounded
+                 flex items-center transition-colors hover:bg-[#e5e5e5]"
+          title="Toggle banner">
+          <i id="toggle-banner-icon" class="fa-solid fa-chevron-up text-[9px]"></i>
+        </button>
+      </div>
+
+      <div id="video-banner"
+        class="border border-[#303030] rounded-lg overflow-hidden bg-[#1e1e1e]
+               transition-all duration-[250ms] max-h-[80px]">
+        <div class="flex items-center p-2.5 gap-3">
+          <img id="video-thumbnail" src="" alt=""
+            class="w-[72px] h-[42px] object-cover rounded-md bg-[#2a2a2a]
+                   border border-[#303030] shrink-0"
+            style="display:none;">
+          <div class="min-w-0 flex-1">
+            <p id="video-title"
+              class="text-[12.5px] font-medium text-white whitespace-nowrap
+                     overflow-hidden text-ellipsis m-0">
+              Detecting video…
+            </p>
+            <span class="inline-flex items-center gap-1.5 text-[10px] text-[#666] mt-1">
+              <i class="fa-brands fa-youtube text-[#ff0033] text-[10px]"></i>Active tab
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Settings overlay ── -->
+    <div id="setup-container"
+      class="hidden absolute inset-0 z-30 bg-[#121212]/95 backdrop-blur-md
+             pt-5 px-5 flex-col">
+
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-[15px] font-semibold text-white">Model settings</h2>
+        <button id="close-settings-btn"
+          class="w-8 h-8 border-none bg-white rounded-md text-black
+                 flex items-center justify-center cursor-pointer
+                 transition-all hover:bg-[#e5e5e5]">
+          <i class="fa-solid fa-xmark"></i> 
+        </button>
+      </div>
+
+      <!-- Provider -->
+      <div class="mb-5">
+        <label class="block text-[10px] font-semibold tracking-[.1em] uppercase text-[#666] mb-2 font-code">
+          AI provider
+        </label>
+        <div class="relative">
+          <select id="model-select"
+            class="w-full bg-[#1e1e1e] border border-[#303030] rounded-lg text-white
+                   text-[13px] py-2.5 pl-3 pr-9 outline-none appearance-none
+                   transition-all focus:border-[#20BEFF] focus:shadow-[0_0_0_2px_rgba(32,190,255,0.15)]">
+            <option value="groq" class="bg-[#1e1e1e]">Groq</option>
+            <option value="gemini" class="bg-[#1e1e1e]">Gemini</option>
+          </select>
+          <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2
+                    text-[10px] text-[#666] pointer-events-none"></i>
+        </div>
+      </div>
+
+      <div class="model-settings-note mb-5 rounded-lg border border-[#303030] bg-[#1a1a1a] p-3 text-[12px] text-[#d0d0d0]">
+        API keys are configured in the backend environment. The frontend does not collect or send them.
+      </div>
+
+      <button id="save-setup-btn"
+        class="w-full bg-white text-black border-none
+               text-[13px] font-semibold py-2.5 rounded-lg cursor-pointer mt-1
+               transition-all hover:bg-[#e5e5e5] active:scale-[0.98]">
+        Save &amp; apply
+      </button>
+    </div>
+
+    <!-- ── Chat history ── -->
+    <div id="chat-history"
+      class="flex-1 overflow-y-auto overflow-x-hidden flex flex-col gap-3
+             px-0.5 pt-1 pb-[100px] custom-scrollbar">
+      <div class="empty-state">
+        <h2>Open a YouTube video to get started</h2>
+        <p>Then ask me anything about what you're watching.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ INPUT ═══ -->
+  <div id="input-wrapper"
+    class="absolute bottom-0 left-0 w-full px-3.5 pt-3 pb-3 z-10"
+    style="background:linear-gradient(to top, #121212 60%, rgba(18,18,18,0))">
+    <div id="input-container"
+      class="flex items-center border border-[#303030] rounded-full bg-[#1e1e1e]
+             py-1.5 pr-1.5 pl-4
+             transition-all focus-within:border-[#f3f3f3] focus-within:shadow-[0_0_0_2px_rgba(255,255,255,0.15)]">
+      <textarea id="question-input" rows="1" aria-label="Ask about this video" placeholder="Ask about this video…" disabled
+        class="flex-1 border-none outline-none bg-transparent text-[13px] text-white
+               py-2 pr-2 placeholder:text-[#555] disabled:cursor-not-allowed"></textarea>
+      <button id="ask-btn" type="button" aria-label="Send message" title="Send message" disabled
+        class="shrink-0 w-8 h-8 border-none rounded-full bg-white text-black
+               flex items-center justify-center cursor-pointer transition-all
+               hover:bg-[#e5e5e5]
+               disabled:bg-[#303030] disabled:text-[#666]
+               disabled:cursor-not-allowed disabled:hover:bg-[#303030]">
+        <i class="fa-solid fa-arrow-up text-[13px]"></i>
+      </button>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+
+</html>
