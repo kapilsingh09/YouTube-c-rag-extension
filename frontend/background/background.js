@@ -2,7 +2,6 @@
 const API_BASE_URL = "http://localhost:8000";
 const WEB_SEARCH_MARKER = '\u001eWEB_SEARCH_USED\u001e';
 const RAG_MARKER = '\u001eRAG_USED\u001e';
-<<<<<<< HEAD
 const SOURCE_TYPE_MARKER_PREFIX = '\u001eSOURCE_TYPE:';
 let activeRequest = null;
 
@@ -14,10 +13,6 @@ function normalizeSourceType(value) {
     return null;
 }
 
-=======
-let activeRequest = null;
-
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
 // Listen for messages from popup or content scripts
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === "ASK_QUESTION") {
@@ -41,17 +36,13 @@ async function handleStreamingRequest(payload) {
     let pendingStreamText = '';
     let webSearchUsed = false;
     let ragUsed = false;
-<<<<<<< HEAD
     let sourceType = null;
-=======
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
     let history = [];
 
     async function consumeStreamText(text, flush = false) {
         pendingStreamText += text;
 
         while (true) {
-<<<<<<< HEAD
             const sourceTypeIndex = pendingStreamText.indexOf(SOURCE_TYPE_MARKER_PREFIX);
             if (sourceTypeIndex !== -1) {
                 const endIndex = pendingStreamText.indexOf('\u001e', sourceTypeIndex + SOURCE_TYPE_MARKER_PREFIX.length);
@@ -63,8 +54,6 @@ async function handleStreamingRequest(payload) {
                 }
             }
 
-=======
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
             const webSearchIndex = pendingStreamText.indexOf(WEB_SEARCH_MARKER);
             const ragIndex = pendingStreamText.indexOf(RAG_MARKER);
             const markerIndex = [webSearchIndex, ragIndex]
@@ -88,11 +77,7 @@ async function handleStreamingRequest(payload) {
             pendingStreamText = '';
         } else {
             let partialMarkerLength = 0;
-<<<<<<< HEAD
             const markers = [WEB_SEARCH_MARKER, RAG_MARKER, SOURCE_TYPE_MARKER_PREFIX + 'rag', SOURCE_TYPE_MARKER_PREFIX + 'web', SOURCE_TYPE_MARKER_PREFIX + 'rag_web'];
-=======
-            const markers = [WEB_SEARCH_MARKER, RAG_MARKER];
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
             for (const marker of markers) {
                 const maxLength = Math.min(pendingStreamText.length, marker.length - 1);
                 for (let length = maxLength; length > 0; length--) {
@@ -102,17 +87,12 @@ async function handleStreamingRequest(payload) {
                     }
                 }
             }
-<<<<<<< HEAD
 
-=======
-            
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
             const visibleLength = pendingStreamText.length - partialMarkerLength;
             fullAnswer += pendingStreamText.slice(0, visibleLength);
             pendingStreamText = pendingStreamText.slice(visibleLength);
         }
 
-<<<<<<< HEAD
         if (ragUsed && webSearchUsed) sourceType = 'rag_web';
         else if (webSearchUsed) sourceType = 'web';
         else if (ragUsed) sourceType = 'rag';
@@ -122,12 +102,6 @@ async function handleStreamingRequest(payload) {
             currentWebSearchUsed: webSearchUsed,
             currentRagUsed: ragUsed,
             currentSourceType: sourceType,
-=======
-        await chrome.storage.local.set({
-            currentStream: fullAnswer,
-            currentWebSearchUsed: webSearchUsed,
-            currentRagUsed: ragUsed
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
         });
     }
 
@@ -138,10 +112,7 @@ async function handleStreamingRequest(payload) {
             currentStream: "",
             currentWebSearchUsed: false,
             currentRagUsed: false,
-<<<<<<< HEAD
             currentSourceType: null,
-=======
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
             currentError: null,
             currentRequestId: payload.requestId
         });
@@ -186,20 +157,13 @@ async function handleStreamingRequest(payload) {
         await consumeStreamText(decoder.decode(), true);
 
         // 6. Complete Stream: move to history, clear stream
-<<<<<<< HEAD
         history.push({ sender: 'bot', text: fullAnswer, webSearchUsed, ragUsed, sourceType });
-=======
-        history.push({ sender: 'bot', text: fullAnswer, webSearchUsed, ragUsed });
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
         await chrome.storage.local.set({
             chatHistory: history,
             currentStream: "",
             currentWebSearchUsed: false,
             currentRagUsed: false,
-<<<<<<< HEAD
             currentSourceType: sourceType,
-=======
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
             isGenerating: false,
             currentRequestId: null
         });
@@ -210,21 +174,14 @@ async function handleStreamingRequest(payload) {
             if (fullAnswer) {
                 const latest = await chrome.storage.local.get(['chatHistory']);
                 history = latest.chatHistory || history;
-<<<<<<< HEAD
                 history.push({ sender: 'bot', text: fullAnswer, webSearchUsed, ragUsed, sourceType });
-=======
-                history.push({ sender: 'bot', text: fullAnswer, webSearchUsed, ragUsed });
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
             }
             await chrome.storage.local.set({
                 chatHistory: history,
                 currentStream: "",
                 currentWebSearchUsed: false,
                 currentRagUsed: false,
-<<<<<<< HEAD
                 currentSourceType: sourceType,
-=======
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
                 isGenerating: false,
                 currentRequestId: null,
                 currentError: null
@@ -238,10 +195,7 @@ async function handleStreamingRequest(payload) {
             currentStream: "",
             currentWebSearchUsed: false,
             currentRagUsed: false,
-<<<<<<< HEAD
             currentSourceType: sourceType,
-=======
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
             currentRequestId: null,
             currentError: error.message || "Network error or backend unavailable"
         });

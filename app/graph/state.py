@@ -39,11 +39,7 @@ class GraphState(TypedDict):
     retry_count: int
 
     # Fast-path flag: skip the grader when retrieval looks sufficient
-<<<<<<< HEAD
     skip_grader: bool
 
     # Actual source state used for the answer.
     source_type: Literal["rag", "web", "rag_web"]
-=======
-    skip_grader: bool
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e

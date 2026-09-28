@@ -7,11 +7,7 @@ import time
 
 from app.rag.retriever import get_retriever
 from app.ingestion.video_summary import ensure_video_summary
-<<<<<<< HEAD
 from app.llm.models import groq_llm, get_groq_variant
-=======
-from app.llm.models import groq_llm, google_llm
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
 from app.graph.state import GraphState
 from tavily import TavilyClient
 from langchain_core.tools import tool
@@ -72,16 +68,10 @@ class RouteDecision(BaseModel):
     )
 
 router_llm = groq_llm.with_structured_output(RouteDecision)
-<<<<<<< HEAD
 
 
 def router_model_for_state(state: GraphState):
     return get_groq_variant(state.get("video_id") or state["messages"][-1].content)
-=======
-google_llm_no_afc = google_llm.bind(
-    automatic_function_calling={"disable": True}
-)
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
 
 
 def is_casual_message(message: str) -> bool:
@@ -187,27 +177,20 @@ Set detailed_summary to true only if the whole-video summary also requests a spe
 
 ### Use "web_search" when:
 
-<<<<<<< HEAD
 The user asks only for web research or current/external information, without asking what the video says.
 
 If the user asks for both information from the video and current/external verification,
 choose "rag" first. The grader will use Web Search for information missing from the transcript,
 so both sources can contribute to the answer.
-=======
-The user explicitly asks to use Tavily, search the web/internet, asks for current or latest information, or asks for external research. This route must be chosen even if the transcript might contain a partial answer.
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
 
 Examples:
 "Use Tavily to search the web for this."
 "Internet par latest information search karo."
 → web_search
 
-<<<<<<< HEAD
 "What does this video say about SSI, and what is SSI currently doing?"
 → rag
 
-=======
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
 Examples:
 "What is self-supervised learning?"
 → rag
@@ -231,11 +214,8 @@ If the user asks about a specific fact or topic from the video, choose "rag".
 When you are unsure whether the question is casual conversation or requires video information, choose "rag".
 
 Do not answer the user's question. Only classify it.
-<<<<<<< HEAD
 Return only a valid JSON object with keys "decision_route" and "detailed_summary".
 Use a string for "decision_route" and a boolean for "detailed_summary".
-=======
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
 
 User message:
 {user_message}
@@ -243,15 +223,11 @@ User message:
 """
 
     try:
-<<<<<<< HEAD
         model = router_model_for_state(state)
         response = model.with_structured_output(
             RouteDecision,
             method="json_mode",
         ).invoke(prompt)
-=======
-        response = router_llm.invoke(prompt)
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
         return {
             "decision_route": response.decision_route,
             "detailed_summary": response.detailed_summary,
@@ -269,19 +245,14 @@ from langchain_core.runnables import RunnableConfig
 
 def response_llm(config: RunnableConfig):
     provider = (config.get("configurable") or {}).get("model", "groq")
-<<<<<<< HEAD
     thread_id = str((config.get("configurable") or {}).get("thread_id") or "default")
     variant = get_groq_variant(thread_id)
     return variant if provider in {"groq", "gemini"} else variant
-=======
-    return groq_llm if provider == "groq" else google_llm_no_afc
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
 
 
 def chat_node(state: GraphState, config: RunnableConfig):
     logger.info("Graph node triggered: chat")
 
-<<<<<<< HEAD
     user_text = state["messages"][-1].content if state["messages"] else ""
     normalized = normalize_text(user_text).lower()
     short_greetings = {
@@ -305,11 +276,6 @@ def chat_node(state: GraphState, config: RunnableConfig):
     response = response_llm(config).invoke(
         [
             SystemMessage(content="Reply in the same language as the user's latest message. If the user is speaking in English, reply in English. If they switch to Hindi or any other language, reply in that language instead. For short greetings such as hi/hello, keep it brief and polite in English."),
-=======
-    response = response_llm(config).invoke(
-        [
-            SystemMessage(content="Reply in the same language as the user's latest message."),
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
             *state["messages"],
         ],
         config=config,
@@ -355,16 +321,9 @@ class ContextGrade(BaseModel):
     )
 
 
-<<<<<<< HEAD
 
 def grader_model_for_state(state: GraphState):
     return get_groq_variant(state.get("video_id") or state["messages"][-1].content)
-=======
-grader_llm = groq_llm.with_structured_output(
-    ContextGrade,
-    method="json_schema",
-)
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
 
 
 def grade_documents(state: GraphState):
@@ -423,14 +382,11 @@ Do NOT choose rewrite_query just because the answer is not in the transcript.
 If the information genuinely does not exist in the transcript,
 choose web_search.
 
-<<<<<<< HEAD
 Return only a valid JSON object with keys "relevance", "completeness",
 "specificity", "confidence", "action", and "reason". The first four
 values must be integers from 0 to 10. "action" must be "generate",
 "rewrite_query", or "web_search". "reason" must be a short string.
 
-=======
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
 User Question:
 {question}
 
@@ -439,15 +395,11 @@ Retrieved YouTube Context:
 """
 
     grader_started = time.perf_counter()
-<<<<<<< HEAD
     model = grader_model_for_state(state)
     result = model.with_structured_output(
         ContextGrade,
         method="json_mode",
     ).invoke(prompt)
-=======
-    result = grader_llm.invoke(prompt)
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
     print(f"[Timing] Grader completed in {time.perf_counter() - grader_started:.2f}s")
 
     overall_score = (
@@ -513,12 +465,8 @@ def rewrite_query_node(state: GraphState):
         context=context
     )
 
-<<<<<<< HEAD
     model = get_groq_variant(state.get("video_id") or state["messages"][-1].content)
     response = model.invoke(prompt)
-=======
-    response = groq_llm.invoke(prompt)
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
 
     rewritten_query = normalize_text(response.content)
 
@@ -545,10 +493,6 @@ def retrieve_node(state: GraphState):
         # Optimize complex or hybrid queries for FAISS semantic search
         if len(query.split()) > 8:
             try:
-<<<<<<< HEAD
-=======
-                from app.llm.models import groq_llm
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
                 optimization_prompt = f"""You are a search query optimizer.
 Extract ONLY the core topic, entities, and keywords from the user's question for a vector database search against a video transcript.
 Ignore conversational filler (e.g., "According to this video", "what does it say").
@@ -557,12 +501,8 @@ Return ONLY the essential keywords separated by spaces.
 
 Question: {query}
 Keywords:"""
-<<<<<<< HEAD
                 model = get_groq_variant(video_id)
                 response = model.invoke(optimization_prompt)
-=======
-                response = groq_llm.invoke(optimization_prompt)
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
                 from app.graph.nodes import normalize_text
                 optimized = normalize_text(response.content)
                 if optimized and len(optimized) > 2:
@@ -758,7 +698,6 @@ Content:
 # ──────────────────────────────────────────────
 
 generate_prompt = ChatPromptTemplate.from_template("""
-<<<<<<< HEAD
 You are a factual QA agent for a YouTube RAG system.
 You have no callable tools. Never attempt a tool call or another web search.
 Web Search, if needed, has already been performed; use only the source material below.
@@ -909,24 +848,6 @@ The goal is:
 RAG first → Web only when necessary → BOTH when genuinely required → never hallucinate.
 
 Use only the provided context and web results to answer. Do not invent missing details.
-=======
-You are an AI assistant answering questions about a YouTube video.
-
-Use the provided context to answer the user's question.
-
-Rules:
-- Use only information supported by the provided context.
-- Treat the video title as reliable metadata and use it for questions about the video's or series' name.
-- The transcript may contain speech-recognition errors. Do not attribute nearby dialogue or actions to a named person unless the context clearly connects them; state when the transcript is unclear.
-- For identity questions, an honorific or a nearby mention of a role is not enough to assign that role to the person. Only state roles or background details that the transcript directly connects to that person.
-- Do not invent information.
-- If web search results are provided, they are additional information.
-- Clearly distinguish information from the YouTube transcript and web sources when useful.
-- If the web search failed or returned no results, say so clearly and do not claim that a web search found supporting information.
-- If the available context does not contain enough information, say so honestly.
-- Keep the answer clear and relevant.
-- Reply in the same language as the user's question, whether it is Hindi, English, or another language.
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
 
 Context:
 {context}
@@ -959,12 +880,9 @@ def generate_node(state: GraphState, config: RunnableConfig):
     provider = (config.get("configurable") or {}).get("model", "groq")
     generation_started = time.perf_counter()
     first_token_logged = False
-<<<<<<< HEAD
     has_rag = bool(state.get("documents"))
     has_web = bool(state.get("web_results"))
     source_type = "rag_web" if has_rag and has_web else "rag" if has_rag else "web" if has_web else "rag"
-=======
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
     print(f"[Graph] Generation started (model={provider})")
 
     # Groq is used for the user-facing stream because it avoids Gemini's

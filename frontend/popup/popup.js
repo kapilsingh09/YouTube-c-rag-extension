@@ -30,10 +30,7 @@ let currentRequestId = null;
 let activeWelcomeGreeting = null;
 let currentWebSearchUsed = false;
 let currentRagUsed = false;
-<<<<<<< HEAD
 let currentSourceType = null;
-=======
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
 
 // DOM Elements
 const videoTitleEl = document.getElementById('video-title');
@@ -104,18 +101,11 @@ function loadState(videoId) {
     chrome.storage.local.get([
         'apiKey', 'selectedModel', 'videoId', 'sessionId', 
         'chatHistory', 'isBannerVisible', 'isModelPillVisible',
-<<<<<<< HEAD
         'isGenerating', 'currentStream', 'currentWebSearchUsed', 'currentRagUsed', 'currentSourceType', 'currentError', 'currentRequestId'
     ], (result) => {
         currentWebSearchUsed = Boolean(result.currentWebSearchUsed);
         currentRagUsed = Boolean(result.currentRagUsed);
         currentSourceType = result.currentSourceType || null;
-=======
-        'isGenerating', 'currentStream', 'currentWebSearchUsed', 'currentRagUsed', 'currentError', 'currentRequestId'
-    ], (result) => {
-        currentWebSearchUsed = Boolean(result.currentWebSearchUsed);
-        currentRagUsed = Boolean(result.currentRagUsed);
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
         
         // Restore Toggles
         if (result.isBannerVisible !== undefined) {
@@ -329,12 +319,9 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
     if (changes.currentRagUsed) {
         currentRagUsed = Boolean(changes.currentRagUsed.newValue);
     }
-<<<<<<< HEAD
     if (changes.currentSourceType) {
         currentSourceType = changes.currentSourceType.newValue || null;
     }
-=======
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
 
     // Chat History updated (either user asked a question, or bot finished)
     if (changes.chatHistory) {
@@ -352,12 +339,8 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
                 currentActiveBotMessageDiv,
                 lastMessage.text,
                 Boolean(lastMessage.webSearchUsed),
-<<<<<<< HEAD
                 Boolean(lastMessage.ragUsed),
                 lastMessage.sourceType || currentSourceType
-=======
-                Boolean(lastMessage.ragUsed)
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
             );
             currentActiveBotMessageDiv = null;
             streamFinished = true;
@@ -378,11 +361,7 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
                 currentActiveBotMessageDiv.classList.add('message', 'bot-message');
                 chatHistoryEl.appendChild(currentActiveBotMessageDiv);
             }
-<<<<<<< HEAD
             renderBotAnswer(currentActiveBotMessageDiv, streamText, currentWebSearchUsed, currentRagUsed, currentSourceType);
-=======
-            renderBotAnswer(currentActiveBotMessageDiv, streamText, currentWebSearchUsed, currentRagUsed);
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
             scrollToBottom();
         }
     }
@@ -457,11 +436,7 @@ function cancelGeneration() {
 
 // --- DOM Render Functions ---
 
-<<<<<<< HEAD
 function renderMessage(sender, text, isError = false, webSearchUsed = false, ragUsed = false, sourceType = null) {
-=======
-function renderMessage(sender, text, isError = false, webSearchUsed = false, ragUsed = false) {
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
     clearWelcomeState();
 
     const msgDiv = document.createElement('div');
@@ -471,11 +446,7 @@ function renderMessage(sender, text, isError = false, webSearchUsed = false, rag
         msgDiv.classList.add('message', sender === 'user' ? 'user-message' : 'bot-message');
     }
     if (sender === 'bot' && !isError) {
-<<<<<<< HEAD
         renderBotAnswer(msgDiv, text, webSearchUsed, ragUsed, sourceType);
-=======
-        renderBotAnswer(msgDiv, text, webSearchUsed, ragUsed);
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
     } else {
         msgDiv.textContent = text;
     }
@@ -483,7 +454,6 @@ function renderMessage(sender, text, isError = false, webSearchUsed = false, rag
     scrollToBottom();
 }
 
-<<<<<<< HEAD
 function normalizeSourceType(sourceType) {
     const normalized = String(sourceType || '').trim().toLowerCase().replace(/[+\s-]+/g, '_');
     if (['rag_web', 'web_rag', 'rag_and_web', 'both', 'combined'].includes(normalized)) return 'rag_web';
@@ -529,50 +499,15 @@ function renderBotAnswer(container, text, webSearchUsed, ragUsed, sourceType = n
         const badgeText = document.createElement('span');
         badgeText.textContent = '📚 RAG';
         topBadge.appendChild(badgeText);
-=======
-function renderBotAnswer(container, text, webSearchUsed, ragUsed) {
-    container.replaceChildren();
-
-    // Add Top Badge if RAG or Web Search was used
-    if (webSearchUsed || ragUsed) {
-        const topBadge = document.createElement('div');
-        topBadge.className = 'top-source-badge';
-
-        const sources = [
-            ...(webSearchUsed ? [{ emoji: '🌐', label: 'Web used' }] : []),
-            ...(ragUsed ? [{ emoji: '📺', label: 'RAG used' }] : [])
-        ];
-
-        for (const source of sources) {
-            const indicator = document.createElement('span');
-            indicator.className = 'source-used';
-
-            const emoji = document.createElement('span');
-            emoji.setAttribute('aria-hidden', 'true');
-            emoji.textContent = source.emoji;
-
-            const label = document.createElement('span');
-            label.textContent = source.label;
-            indicator.append(emoji, label);
-            topBadge.appendChild(indicator);
-        }
-
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
         container.appendChild(topBadge);
     }
 
     const contentDiv = document.createElement('div');
     contentDiv.className = 'markdown-content';
-<<<<<<< HEAD
     const visibleText = resolvedText
         .replaceAll('\u001eWEB_SEARCH_USED\u001e', '')
         .replaceAll('\u001eRAG_USED\u001e', '')
         .replaceAll(/\u001eSOURCE_TYPE:[^\u001e]*\u001e/g, '');
-=======
-    const visibleText = String(text || '')
-        .replaceAll('\u001eWEB_SEARCH_USED\u001e', '')
-        .replaceAll('\u001eRAG_USED\u001e', '');
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
     renderMarkdownInto(contentDiv, visibleText);
     container.appendChild(contentDiv);
 }
@@ -581,15 +516,11 @@ function renderChatHistory(historyArr) {
     chatHistoryEl.innerHTML = '';
     if (!historyArr) return;
     historyArr.forEach(msg => {
-<<<<<<< HEAD
         const msgText = String(msg.text || '');
         const webUsed = Boolean(msg.webSearchUsed) || msgText.includes('\u001eWEB_SEARCH_USED\u001e');
         const ragUsed = Boolean(msg.ragUsed) || msgText.includes('\u001eRAG_USED\u001e');
         const msgSourceType = msg.sourceType || msg.source_type || null;
         renderMessage(msg.sender, msg.text, false, webUsed, ragUsed, msgSourceType);
-=======
-        renderMessage(msg.sender, msg.text, false, Boolean(msg.webSearchUsed), Boolean(msg.ragUsed));
->>>>>>> 13da7b824cf1679b856c26d8213f656a276d558e
     });
 
     if (!historyArr.length && !currentActiveBotMessageDiv) {
